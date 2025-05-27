@@ -1,9 +1,8 @@
 package org.example.camticketkotlin.event
 
-data class UserUpdatedEvent(
+data class UserProfileImageUpdatedEvent(
     val userId: Long,
-    val nickname: String?,
-    val introduction: String?
+    val profileImageUrl: String
 ) : KafkaEvent {
     override fun toKafkaMessage(): Any = this
 }

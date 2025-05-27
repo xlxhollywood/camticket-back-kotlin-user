@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import org.example.camticketkotlin.domain.enums.Role
+import org.example.camticketkotlin.event.UserProfileImageUpdatedEvent
 import org.example.camticketkotlin.event.UserUpdatedEvent
 import org.example.camticketkotlin.kafka.GenericKafkaProducer
 
@@ -24,7 +25,10 @@ class UserService (
     companion object {
         private val logger = LoggerFactory.getLogger(UserService::class.java)
     }
-
+    /**
+     * 사용자 닉네임과 소개글을 수정합니다.
+     * 프로필 이미지 수정은 포함되지 않습니다.
+     */
     @Transactional
     fun updateUserProfile(user: User, request: UserProfileUpdateRequest) {
         val foundUser = getUserById(user.id!!)
@@ -61,7 +65,7 @@ class UserService (
             val event = UserUpdatedEvent(
                 userId = foundUser.id!!,
                 nickname = foundUser.nickName,
-                profileImageUrl = foundUser.profileImageUrl
+                introduction = foundUser.introduction
             )
             kafkaProducer.send("user.updated", foundUser.id.toString(), event)
         }
@@ -84,14 +88,13 @@ class UserService (
 
         foundUser.profileImageUrl = uploadedUrl
 
-        // ✅ Kafka 이벤트 발행
-        val event = UserUpdatedEvent(
+        // ✅ Kafka 이벤트 발행 (이미지 전용)
+        val event = UserProfileImageUpdatedEvent(
             userId = foundUser.id!!,
-            nickname = foundUser.nickName,
             profileImageUrl = uploadedUrl
         )
-        kafkaProducer.send("user.updated", foundUser.id.toString(), event)
-        logger.info("📤 Kafka 메시지 전송 완료: user.updated → ${foundUser.id}")
+        kafkaProducer.send("user.profile-image-updated", foundUser.id.toString(), event)
+        logger.info("📤 Kafka 전송 완료: user.profile-image-updated → ${foundUser.id}")
 
         return uploadedUrl
     }
