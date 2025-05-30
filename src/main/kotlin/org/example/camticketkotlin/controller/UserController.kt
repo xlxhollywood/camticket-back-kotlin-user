@@ -36,6 +36,21 @@ class UserController (
             .body(ApiWrapper.success(user.id!!, "프로필이 성공적으로 수정되었습니다."))
     }
 
+//    @PatchMapping("/profile")
+//    fun updateProfile(
+//        // @AuthenticationPrincipal user: User,  // 임시 주석
+//        @RequestBody request: UserProfileUpdateRequest
+//    ): ResponseEntity<ApiWrapper<Long>> {
+//        // 임시로 하드코딩된 사용자 ID 사용
+//        val testUserId = 10L
+//        val testUser = userService.getUserById(testUserId)
+//
+//        userService.updateUserProfile(testUser, request)
+//        return ResponseEntity
+//            .status(HttpStatus.OK)
+//            .body(ApiWrapper.success(testUser.id!!, "프로필이 성공적으로 수정되었습니다."))
+//    }
+
     @PatchMapping("/profile/image", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @ApiResponse(responseCode = "200", description = "프로필 이미지 수정 성공")
     @Operation(summary = "프로필 이미지 수정", description = "사용자의 프로필 이미지를 변경합니다.")

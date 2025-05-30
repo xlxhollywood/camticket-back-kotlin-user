@@ -32,7 +32,6 @@ class UserService (
     @Transactional
     fun updateUserProfile(user: User, request: UserProfileUpdateRequest) {
         val foundUser = getUserById(user.id!!)
-
         var updated = false
 
         request.nickName?.let { newNickName ->
@@ -60,12 +59,21 @@ class UserService (
             }
         }
 
+        // ✅ bankAccount 처리 추가
+        request.bankAccount?.let {
+            if (foundUser.bankAccount != it) {
+                foundUser.bankAccount = it
+                updated = true
+            }
+        }
+
         // ✅ Kafka 발행: 변경된 경우에만
         if (updated) {
             val event = UserUpdatedEvent(
                 userId = foundUser.id!!,
                 nickname = foundUser.nickName,
-                introduction = foundUser.introduction
+                introduction = foundUser.introduction,
+                bankAccount = foundUser.bankAccount
             )
             kafkaProducer.send("user.updated", foundUser.id.toString(), event)
         }
