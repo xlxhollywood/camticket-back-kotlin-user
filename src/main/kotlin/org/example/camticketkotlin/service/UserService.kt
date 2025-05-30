@@ -1,12 +1,12 @@
-package com.camticket.user.service
+package org.example.camticketkotlin.service  // ✅ 수정
 
-import com.camticket.user.domain.User
-import com.camticket.user.domain.enums.Role
-import com.camticket.user.dto.UserDto
-import com.camticket.user.dto.request.UserProfileUpdateRequest
-import com.camticket.user.dto.response.ArtistUserOverviewResponse
-import com.camticket.user.exception.NotFoundException
-import com.camticket.user.repository.UserRepository
+import org.example.camticketkotlin.domain.User
+import org.example.camticketkotlin.domain.enums.Role
+import org.example.camticketkotlin.dto.UserDto
+import org.example.camticketkotlin.dto.request.UserProfileUpdateRequest
+import org.example.camticketkotlin.dto.response.ArtistUserOverviewResponse
+import org.example.camticketkotlin.exception.NotFoundException
+import org.example.camticketkotlin.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -111,5 +111,14 @@ class UserService(
     @Transactional(readOnly = true)
     fun existsById(userId: Long): Boolean {
         return userRepository.existsById(userId)
+    }
+
+    // 닉네임으로 사용자 검색 (UserController에서 필요함)
+    @Transactional(readOnly = true)
+    fun searchUserByNickname(nickname: String): UserDto {
+        val user = userRepository.findByNickName(nickname)
+            ?: throw NotFoundException("해당 닉네임의 사용자가 존재하지 않습니다.")
+
+        return UserDto.toDto(user)
     }
 }

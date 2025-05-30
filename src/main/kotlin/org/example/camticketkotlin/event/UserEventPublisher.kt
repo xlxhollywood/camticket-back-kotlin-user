@@ -1,6 +1,6 @@
 package org.example.camticketkotlin.event
 
-import com.camticket.user.domain.UserDomainEvent
+import org.example.camticketkotlin.domain.UserDomainEvent  // ✅ 수정
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
@@ -13,10 +13,10 @@ import java.util.*
 @Component
 class UserEventPublisher(
     private val kafkaTemplate: KafkaTemplate<String, Any>,
-    @Value("\${app.kafka.topics.user-events}") 
+    @Value("\${app.kafka.topics.user-events}")
     private val userEventsTopic: String
 ) {
-    
+
     companion object {
         private val logger = LoggerFactory.getLogger(UserEventPublisher::class.java)
     }
@@ -36,7 +36,7 @@ class UserEventPublisher(
                 "role" to event.role.name
             )
         )
-        
+
         publishEvent(kafkaEvent, event.userId.toString())
     }
 
@@ -56,7 +56,7 @@ class UserEventPublisher(
                 )
             )
         )
-        
+
         publishEvent(kafkaEvent, event.userId.toString())
     }
 
@@ -73,7 +73,7 @@ class UserEventPublisher(
                 "newImageUrl" to event.newImageUrl
             )
         )
-        
+
         publishEvent(kafkaEvent, event.userId.toString())
     }
 
@@ -93,7 +93,6 @@ class UserEventPublisher(
     }
 }
 
-// UserKafkaEvent.kt
 data class UserKafkaEvent(
     val eventId: String,
     val eventType: String,
