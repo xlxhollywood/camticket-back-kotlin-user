@@ -13,25 +13,32 @@ class AuthService(
         private val randomNicknameService: RandomNicknameService
 ) {
 
-    // 카카오 로그인 로직
+    // AuthService에 로그 추가
     fun kakaoLogin(dto: UserDto): UserDto {
-        // ?: null이 아니면
         val kakaoId = dto.kakaoId ?: throw IllegalArgumentException("카카오 ID는 null일 수 없습니다.")
 
         val user = userRepository.findByKakaoId(kakaoId)
-                .orElseGet {
-                    val newUser = User.from(dto)
-                    newUser.nickName = randomNicknameService.generateUniqueNickname()
-                    userRepository.save(newUser)
-                }
+            .orElseGet {
+                println("🆕 신규 사용자 생성: kakaoId=$kakaoId")
+                val newUser = User.from(dto)
+                newUser.nickName = randomNicknameService.generateUniqueNickname()
+                val savedUser = userRepository.save(newUser)
+                println("✅ 사용자 저장 완료: userId=${savedUser.id}")
 
-        user.email = dto.email
-        user.profileImageUrl = dto.profileImageUrl
-        user.name = dto.name
+                savedUser.publishRegisteredEvent()
+                println("📤 이벤트 발행 요청: userId=${savedUser.id}")
+                savedUser
+            }
+
+        println("🔄 기존 사용자 로그인: userId=${user.id}")
+
+        // 기존 사용자 정보 업데이트
+        dto.email?.let { user.email = it }
+        dto.profileImageUrl?.let { user.profileImageUrl = it }
+        dto.name?.let { user.name = it }
 
         return UserDto.toDto(user)
     }
-
 
     // 사용자 ID로 로그인한 사용자 정보 조회
     fun getLoginUser(userId: Long): User {

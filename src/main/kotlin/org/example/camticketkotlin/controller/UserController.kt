@@ -20,9 +20,9 @@ import org.example.camticketkotlin.common.ApiResponse as ApiWrapper
 
 @RestController
 @RequestMapping("/camticket/api/user")
-class UserController (
+class UserController(
     private val userService: UserService
-){
+) {
     @PatchMapping("/profile")
     @ApiResponse(responseCode = "200", description = "프로필 수정 성공")
     @Operation(summary = "사용자 프로필 수정", description = "닉네임, 소개글을 수정합니다.")
@@ -35,21 +35,6 @@ class UserController (
             .status(HttpStatus.OK)
             .body(ApiWrapper.success(user.id!!, "프로필이 성공적으로 수정되었습니다."))
     }
-
-//    @PatchMapping("/profile")
-//    fun updateProfile(
-//        // @AuthenticationPrincipal user: User,  // 임시 주석
-//        @RequestBody request: UserProfileUpdateRequest
-//    ): ResponseEntity<ApiWrapper<Long>> {
-//        // 임시로 하드코딩된 사용자 ID 사용
-//        val testUserId = 10L
-//        val testUser = userService.getUserById(testUserId)
-//
-//        userService.updateUserProfile(testUser, request)
-//        return ResponseEntity
-//            .status(HttpStatus.OK)
-//            .body(ApiWrapper.success(testUser.id!!, "프로필이 성공적으로 수정되었습니다."))
-//    }
 
     @PatchMapping("/profile/image", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @ApiResponse(responseCode = "200", description = "프로필 이미지 수정 성공")
@@ -106,5 +91,24 @@ class UserController (
         return ResponseEntity.ok(ApiWrapper.success(userDto, "닉네임으로 유저 검색에 성공했습니다."))
     }
 
-
+    @PostMapping("/withdraw")
+    @Operation(summary = "회원 탈퇴", description = "사용자가 회원 탈퇴를 진행합니다.")
+    @ApiResponses(value = [
+        ApiResponse(responseCode = "200", description = "탈퇴 성공"),
+        ApiResponse(responseCode = "400", description = "탈퇴 불가 (활성 공연 존재)"),
+        ApiResponse(responseCode = "401", description = "인증 필요")
+    ])
+    fun withdrawUser(
+        @AuthenticationPrincipal user: User,
+        @RequestBody request: UserWithdrawalRequest
+    ): ResponseEntity<ApiWrapper<Unit>> {
+        userService.withdrawUser(user, request.reason)
+        return ResponseEntity.ok(ApiWrapper.success("회원 탈퇴가 완료되었습니다."))
+    }
 }
+
+// 탈퇴 요청 DTO
+data class UserWithdrawalRequest(
+    val reason: String?,
+    val password: String? // 본인 확인용 (카카오 로그인이라 생략 가능)
+)

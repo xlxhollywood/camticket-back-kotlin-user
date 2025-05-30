@@ -121,4 +121,20 @@ class UserService(
 
         return UserDto.toDto(user)
     }
+
+    @Transactional
+    fun withdrawUser(user: User, reason: String?) {
+        val foundUser = userRepository.findById(user.id!!)
+            .orElseThrow { NotFoundException("해당 유저가 존재하지 않습니다.") }
+
+        if (!foundUser.isActive) {
+            throw IllegalStateException("이미 탈퇴한 사용자입니다.")
+        }
+
+        // 사용자 데이터 마스킹
+        foundUser.maskUserData()
+        userRepository.save(foundUser)
+
+        logger.info("사용자 탈퇴 처리 완료: userId=${foundUser.id}, reason=$reason")
+    }
 }
