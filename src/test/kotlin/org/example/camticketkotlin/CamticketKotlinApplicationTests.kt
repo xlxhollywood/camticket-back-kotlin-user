@@ -12,6 +12,6 @@ class CamticketKotlinApplicationTests {
     fun printAwsCallerArn() {
         val stsClient = StsClient.create()
         val response = stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build())
-        println("🔐 현재 AWS ARN: ${response.arn()}")
+//        println("🔐 현재 AWS ARN: ${response.arn()}")
     }
 }

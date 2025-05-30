@@ -43,9 +43,9 @@ class S3Uploader(
                 .build()
 
             s3Client.deleteObject(deleteRequest)
-            println("🗑️ S3에서 삭제 완료: $key")
+//            println("🗑️ S3에서 삭제 완료: $key")
         } catch (e: Exception) {
-            println("⚠️ S3 삭제 실패 (무시됨): $imageUrl, 이유: ${e.message}")
+//            println("⚠️ S3 삭제 실패 (무시됨): $imageUrl, 이유: ${e.message}")
         }
     }
 
@@ -55,7 +55,7 @@ class S3Uploader(
             try {
                 delete(url) // 내부에서도 try-catch 있지만, 중첩해도 문제없음
             } catch (e: Exception) {
-                println("⚠️ 다중 삭제 중 실패 (무시됨): $url, 이유: ${e.message}")
+//                println("⚠️ 다중 삭제 중 실패 (무시됨): $url, 이유: ${e.message}")
             }
         }
     }
