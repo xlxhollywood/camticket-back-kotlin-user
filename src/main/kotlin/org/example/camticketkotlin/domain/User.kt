@@ -130,6 +130,11 @@ class User private constructor(
 
             return user
         }
+
+        // ✅ 이 메서드 추가 (AuthService에서 사용)
+        fun from(dto: UserDto): User {
+            return create(dto)
+        }
     }
 }
 

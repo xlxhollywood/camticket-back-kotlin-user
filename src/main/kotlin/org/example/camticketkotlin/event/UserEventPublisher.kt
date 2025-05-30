@@ -11,7 +11,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Component
-class UserEventPublisher(
+class UserEventPublisher (
     private val kafkaTemplate: KafkaTemplate<String, Any>,
     @Value("\${app.kafka.topics.user-events}")
     private val userEventsTopic: String
